@@ -128,15 +128,18 @@ export default function AuthPage() {
       <div className="w-full max-w-md p-6 sm:p-8 rounded-3xl glass-panel shadow-2xl border border-white/10 space-y-6">
         {/* Brand Header */}
         <div className="text-center space-y-3">
-          <Link href="/" className="inline-flex items-center gap-3 group">
+          <Link href="/" className="inline-flex items-center gap-2 group">
             <NetflyIcon
               className="w-14 h-14 sm:w-16 sm:h-16 shrink-0 group-hover:scale-105 transition-transform"
               size={96}
               priority
             />
-            <span className="text-3xl sm:text-4xl font-black text-white tracking-wider">
-              NET<span className="text-red-500">FLY</span>
-            </span>
+            <div className="flex items-center gap-1 leading-none">
+              <span className="text-3xl sm:text-4xl font-black text-white tracking-wider group-hover:text-red-400 transition-colors">
+                Play
+              </span>
+              <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.9)] animate-pulse" />
+            </div>
           </Link>
           <h1 className="text-xl sm:text-2xl font-bold text-white pt-2">
             {isSignUp ? 'Create Free Account' : 'Welcome Back'}

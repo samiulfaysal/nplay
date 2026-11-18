@@ -178,7 +178,7 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-[#0a0a0f]/95 backdrop-blur-md border-b border-white/10 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 py-3 sm:py-3.5">
-        {/* Brand Logo - Netfly Inspired */}
+        {/* Brand Logo - [N] Play */}
         <Link href="/" className="flex items-center gap-2 group shrink-0 py-0.5">
           <div className="relative group-hover:scale-105 transition-transform">
             <NetflyIcon
@@ -188,9 +188,12 @@ export function Navbar() {
             />
           </div>
           <div className="flex flex-col justify-center">
-            <span className="text-xl sm:text-2xl font-black tracking-wider text-white leading-none">
-              NET<span className="text-red-500">FLY</span>
-            </span>
+            <div className="flex items-center gap-1 leading-none">
+              <span className="text-xl sm:text-2xl font-black tracking-wider text-white group-hover:text-red-400 transition-colors">
+                Play
+              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.9)] animate-pulse" />
+            </div>
             <span className="text-[9px] uppercase tracking-widest text-red-400 font-bold mt-0.5 hidden sm:block whitespace-nowrap">
               Stream Free Cinema & Shows
             </span>

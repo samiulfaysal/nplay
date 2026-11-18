@@ -44,7 +44,7 @@ export async function generateMetadata({
 
   if (!content) {
     return {
-      title: 'Watch Title - Netfly Cinema',
+      title: 'Watch Title - nPlay Cinema',
     };
   }
 
@@ -53,7 +53,7 @@ export async function generateMetadata({
   const releaseYear = releaseDate ? releaseDate.slice(0, 4) : '2024';
   const overview =
     content.overview ||
-    `Stream ${title} (${releaseYear}) in HD with multi-server mirrors on Netfly. 100% free streaming with zero subscriptions.`;
+    `Stream ${title} (${releaseYear}) in HD with multi-server mirrors on nPlay. 100% free streaming with zero subscriptions.`;
   const backdrop = content.backdrop_path
     ? content.backdrop_path.startsWith('http')
       ? content.backdrop_path

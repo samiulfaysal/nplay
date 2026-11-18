@@ -18,7 +18,7 @@ export function NetflyIcon({
     >
       <Image
         src="/logo.png"
-        alt="Netfly Cinema Logo"
+        alt="nPlay Cinema Logo"
         width={size}
         height={size}
         priority={priority}
@@ -28,4 +28,5 @@ export function NetflyIcon({
   );
 }
 
+export const NPlayIcon = NetflyIcon;
 export default NetflyIcon;

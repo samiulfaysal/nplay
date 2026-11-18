@@ -16,16 +16,19 @@ export function Footer() {
             <Link href="/" className="flex items-center gap-2.5 group">
               <NetflyIcon className="w-8 h-8 sm:w-9 sm:h-9 shrink-0 group-hover:scale-105 transition-transform" size={48} />
               <div className="flex flex-col">
-                <span className="text-xl sm:text-2xl font-black text-white tracking-wider leading-none">
-                  NET<span className="text-red-500">FLY</span>
-                </span>
+                <div className="flex items-center gap-1 leading-none">
+                  <span className="text-xl sm:text-2xl font-black text-white tracking-wider group-hover:text-red-400 transition-colors">
+                    Play
+                  </span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.9)]" />
+                </div>
                 <span className="text-[9px] uppercase tracking-widest text-red-400 font-bold mt-0.5">
                   Stream Free Cinema & Shows
                 </span>
               </div>
             </Link>
             <p className="text-xs text-gray-500 leading-relaxed max-w-md">
-              Netfly is a high-performance free cinema streaming web application. Content metadata is provided by TMDB. This platform does not host copyrighted media files on its servers; all streams are resolved through decentralized third-party provider scrapers.
+              nPlay is a high-performance free cinema streaming web application. Content metadata is provided by TMDB. This platform does not host copyrighted media files on its servers; all streams are resolved through decentralized third-party provider scrapers.
             </p>
           </div>
 
@@ -97,7 +100,7 @@ export function Footer() {
         </div>
 
         <div className="mt-8 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500 gap-4">
-          <div>© {new Date().getFullYear()} Netfly Cinema. All rights reserved.</div>
+          <div>© {new Date().getFullYear()} nPlay Cinema. All rights reserved.</div>
           <div className="flex flex-wrap items-center gap-2.5 text-xs">
             {/* Live Server Status Indicator */}
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium">
@@ -111,7 +114,7 @@ export function Footer() {
             {/* App Version Badge - Automatically extracted from latest release/git build */}
             <span
               className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400 font-mono text-[11px]"
-              title={`Netfly Build v${appVersion}`}
+              title={`nPlay Build v${appVersion}`}
             >
               v{appVersion}
             </span>

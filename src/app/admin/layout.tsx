@@ -44,10 +44,13 @@ export default async function AdminLayout({
             <Link href="/admin" className="flex items-center gap-3 group">
               <NetflyIcon className="w-10 h-10 shrink-0 group-hover:scale-105 transition-transform" size={64} />
               <div>
-                <span className="font-black text-white tracking-wider text-lg leading-none block">
-                  NET<span className="text-red-500">FLY</span>
-                </span>
-                <span className="text-[10px] font-bold text-red-400 tracking-wider uppercase mt-0.5 block">
+                <div className="flex items-center gap-1 leading-none">
+                  <span className="font-black text-white tracking-wider text-lg block group-hover:text-red-400 transition-colors">
+                    Play
+                  </span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.9)]" />
+                </div>
+                <span className="text-[10px] font-bold text-red-400 tracking-wider uppercase mt-1 block">
                   Admin Console
                 </span>
               </div>

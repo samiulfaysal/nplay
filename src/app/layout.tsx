@@ -5,9 +5,9 @@ import { Footer } from '@/components/layout/Footer';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 
 export const metadata: Metadata = {
-  title: 'Netfly - Watch Free Movies, TV Series & Anime HD',
+  title: 'nPlay - Watch Free Movies, TV Series & Anime HD',
   description:
-    'Stream unlimited movies, binge-worthy TV series, and trending anime in Ultra HD on Netfly. 100% free streaming with zero subscriptions required.',
+    'Stream unlimited movies, binge-worthy TV series, and trending anime in Ultra HD on nPlay. 100% free streaming with zero subscriptions required.',
   manifest: '/manifest.json',
   icons: {
     icon: [
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Netfly',
+    title: 'nPlay',
   },
 };
 

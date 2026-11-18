@@ -1,6 +1,6 @@
 {
-  "name": "Netfly - Free Movies & TV-Series Streaming HD",
-  "short_name": "Netfly",
+  "name": "nPlay - Free Movies & TV-Series Streaming HD",
+  "short_name": "nPlay",
   "description": "Watch the latest movies, TV series, and anime in HD quality with multi-server playback.",
   "start_url": "/",
   "display": "standalone",

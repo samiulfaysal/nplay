@@ -15,8 +15,8 @@ export function ShareButton({ title }: ShareButtonProps) {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${title} - Watch Free on Netfly`,
-          text: `Check out ${title} streaming in HD on Netfly!`,
+          title: `${title} - Watch Free on nPlay`,
+          text: `Check out ${title} streaming in HD on nPlay!`,
           url,
         });
         return;

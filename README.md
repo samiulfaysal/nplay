@@ -1,4 +1,4 @@
-# 🎬 Netfly - Free Movie & TV-Series Streaming Platform
+# 🎬 nPlay - Free Movie & TV-Series Streaming Platform
 
 A modern, scalable, dark-themed cinematic web application for streaming free movies and TV series, powered by TMDB metadata and resilient multi-server streaming resolvers.
 
