@@ -89,6 +89,13 @@ export function VideoPlayer({
     }, 4000);
   };
 
+  // Keep activeServerId in sync when navigating between movies/shows
+  useEffect(() => {
+    if (sources.length > 0 && !sources.some((s) => s.id === activeServerId)) {
+      setActiveServerId(sources[0].id);
+    }
+  }, [sources, activeServerId]);
+
   const activeSource = sources.find((s) => s.id === activeServerId) || sources[0] || null;
   const activeServerName = activeSource?.provider || 'MovieBox Pro';
 
@@ -348,6 +355,8 @@ export function VideoPlayer({
           ref={videoRef}
           poster={poster}
           onTimeUpdate={handleTimeUpdate}
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
           onEnded={() => {
             setIsPlaying(false);
             if (isTv && onNextEpisode) onNextEpisode();

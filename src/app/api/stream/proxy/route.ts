@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 
     const upstreamRes = await fetch(targetUrl, {
       headers: upstreamHeaders,
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(45000),
     });
 
     const isSuccess = upstreamRes.status === 200 || upstreamRes.status === 206;
@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
       contentType = targetUrl.includes('.mp4') ? 'video/mp4' : 'application/octet-stream';
     }
 
-    const body = await upstreamRes.arrayBuffer();
+    const body = upstreamRes.body;
 
     const responseHeaders: Record<string, string> = {
       'Content-Type': contentType,
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
       'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
       'Access-Control-Expose-Headers': 'Content-Length, Content-Range, Accept-Ranges',
       'Accept-Ranges': 'bytes',
-      'Cache-Control': isM3u8 ? 'no-cache' : 'public, max-age=3600',
+      'Cache-Control': isM3u8 ? 'no-cache' : 'public, max-age=86400',
     };
 
     const contentRange = upstreamRes.headers.get('content-range');
