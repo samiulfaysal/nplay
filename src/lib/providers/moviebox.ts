@@ -278,10 +278,9 @@ export class MovieBoxProvider implements IStreamingProvider {
               const streamUrl = s.url || s.playUrl;
               if (!streamUrl) continue;
 
-              // Filter out 10-minute preview clips or unplayable DASH manifests
-              const isPreview = streamUrl.includes('/preview/') || (s.duration && s.duration < 900 && !isTv);
-              const isDash = s.format === 'DASH' || streamUrl.includes('.mpd');
-              if (isPreview || isDash) {
+              // Filter out short preview clips only when full stream is present
+              const isPreview = streamUrl.includes('/preview/') && rawStreams.length > 1;
+              if (isPreview) {
                 continue;
               }
 
@@ -296,16 +295,23 @@ export class MovieBoxProvider implements IStreamingProvider {
                   : '480p';
 
               const cookieParam = s.signCookie ? `&cookie=${encodeURIComponent(s.signCookie)}` : '';
+              const isDash = s.format === 'DASH' || streamUrl.includes('.mpd');
+              const streamType = isDash
+                ? ('dash' as any)
+                : streamUrl.includes('.m3u8')
+                ? 'hls'
+                : 'mp4';
+
               sources.push({
                 id: `moviebox-${subjectId}-${resNumber}`,
                 provider: this.name,
                 url: `/api/stream/proxy?url=${encodeURIComponent(streamUrl)}&ref=https://sportslive.wine${cookieParam}`,
-                type: streamUrl.includes('.m3u8') ? 'hls' : 'mp4',
+                type: streamType,
                 quality: qualityLabel,
                 isDirect: true,
                 adStatus: 'ad-free',
-                badgeLabel: 'Ad-Free',
-                tooltip: `MovieBox high-bitrate direct stream (${qualityLabel}) with zero popups and signed CDN caching`,
+                badgeLabel: 'Ad-Free Pro',
+                tooltip: `MovieBox Pro direct native stream (${qualityLabel}) with zero popups and signed CDN caching`,
               });
             }
 

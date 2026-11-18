@@ -85,163 +85,10 @@ export class SparkBoxCoreService {
       year = '',
     } = query;
 
-    // 2. High-Performance Multi-Cloud Embed Server Chain with Active Health Probes
-    let vidlinkUrl =
-      type === 'tv'
-        ? `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}?autoplay=true`
-        : `https://vidlink.pro/movie/${tmdbId}?autoplay=true`;
+    // 2. Pure Native Direct Architecture - Zero 3rd party iframes or popup embeds
+    const embedServers: EmbedServer[] = [];
 
-    let vidsrcMeUrl =
-      type === 'tv'
-        ? `https://vidsrc.me/embed/tv?tmdb=${tmdbId}&season=${season}&episode=${episode}`
-        : `https://vidsrc.me/embed/movie?tmdb=${tmdbId}`;
-
-    let multiembedUrl =
-      type === 'tv'
-        ? `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${season}&e=${episode}`
-        : `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
-
-    let vidsrcCcUrl =
-      type === 'tv'
-        ? `https://vidsrc.cc/v2/embed/tv/${tmdbId}/${season}/${episode}`
-        : `https://vidsrc.cc/v2/embed/movie/${tmdbId}`;
-
-    let autoembedUrl =
-      type === 'tv'
-        ? `https://player.autoembed.cc/embed/tv/${tmdbId}/${season}/${episode}`
-        : `https://player.autoembed.cc/embed/movie/${tmdbId}`;
-
-    let twoEmbedUrl =
-      type === 'tv'
-        ? `https://www.2embed.cc/embedtv/${tmdbId}&s=${season}&e=${episode}`
-        : `https://www.2embed.cc/embed/${tmdbId}`;
-
-    // Runtime server overrides via SettingsStore
-    try {
-      const settings = await getAppSettings();
-      if (settings.serverVidsrc) {
-        vidsrcCcUrl = settings.serverVidsrc
-          .replace('{type}', type)
-          .replace('{tmdbId}', String(tmdbId))
-          .replace('{season}', String(season))
-          .replace('{episode}', String(episode));
-      }
-      if (settings.serverAutoembed) {
-        autoembedUrl = settings.serverAutoembed
-          .replace('{type}', type)
-          .replace('{tmdbId}', String(tmdbId))
-          .replace('{season}', String(season))
-          .replace('{episode}', String(episode));
-      }
-      if (settings.serverTwoEmbed) {
-        twoEmbedUrl = settings.serverTwoEmbed
-          .replace('{type}', type)
-          .replace('{tmdbId}', String(tmdbId))
-          .replace('{season}', String(season))
-          .replace('{episode}', String(episode));
-      }
-    } catch {
-      // Non-blocking fallback
-    }
-
-    // Fast parallel probe (1500ms timeout) to verify which embed server has real playable content
-    let twoEmbedHasStream = false;
-    let vidsrcMeAlive = false;
-
-    try {
-      const [r2embed, rVidsrc] = await Promise.allSettled([
-        fetch(twoEmbedUrl, {
-          headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
-          signal: AbortSignal.timeout(1500),
-        }).then(async (res) => {
-          if (!res.ok) return false;
-          const text = await res.text();
-          return text.includes('streamsrcs.2embed.cc');
-        }),
-        fetch(vidsrcMeUrl, {
-          headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
-          signal: AbortSignal.timeout(1500),
-        }).then((res) => res.ok),
-      ]);
-
-      if (r2embed.status === 'fulfilled' && r2embed.value) {
-        twoEmbedHasStream = true;
-      }
-      if (rVidsrc.status === 'fulfilled' && rVidsrc.value) {
-        vidsrcMeAlive = true;
-      }
-    } catch {
-      // Non-blocking probe
-    }
-
-    const embedServers: EmbedServer[] = [
-      {
-        id: 'server-vidsrc-cc',
-        name: 'Server 2 (VidSrc Ultimate / Active)',
-        url: vidsrcCcUrl,
-        quality: '1080p HD',
-        adStatus: 'minimal-ads',
-        badgeLabel: 'Minimal Ads',
-        tooltip: 'High-availability VidSrc global mirror with latest releases and universal coverage',
-        isVerifiedAvailable: true,
-      },
-      {
-        id: 'server-2embed',
-        name: twoEmbedHasStream ? 'Server 3 (2Embed Verified Stream)' : 'Server 3 (2Embed Mirror)',
-        url: twoEmbedUrl,
-        quality: '1080p HD',
-        adStatus: 'minimal-ads',
-        badgeLabel: twoEmbedHasStream ? 'Ad-Free' : 'Minimal Ads',
-        tooltip: '2Embed high-availability cloud player with verified streaming source',
-        isVerifiedAvailable: twoEmbedHasStream,
-      },
-      {
-        id: 'server-vidlink',
-        name: 'Server 4 (VidLink VIP)',
-        url: vidlinkUrl,
-        quality: '1080p HD',
-        adStatus: 'minimal-ads',
-        badgeLabel: 'Minimal Ads',
-        tooltip: 'Clean high-speed cloud stream with multi-audio & subtitles',
-      },
-      {
-        id: 'server-vidsrc-me',
-        name: vidsrcMeAlive ? 'Server 5 (VidSrc Clean)' : 'Server 5 (VidSrc Fast)',
-        url: vidsrcMeUrl,
-        quality: '1080p HD',
-        adStatus: 'minimal-ads',
-        badgeLabel: 'Minimal Ads',
-        tooltip: 'VidSrc multi-cloud streaming mirror with active subtitle tracks',
-        isVerifiedAvailable: vidsrcMeAlive,
-      },
-      {
-        id: 'server-multiembed',
-        name: 'Server 6 (MultiEmbed Direct)',
-        url: multiembedUrl,
-        quality: '1080p HD',
-        adStatus: 'minimal-ads',
-        badgeLabel: 'Minimal Ads',
-        tooltip: 'MultiEmbed direct cloud stream fallback',
-      },
-      {
-        id: 'server-autoembed',
-        name: 'Backup Server (AutoEmbed)',
-        url: autoembedUrl,
-        quality: '1080p HD',
-        adStatus: 'has-ads',
-        badgeLabel: 'Ads',
-        tooltip: 'Emergency mirror (warning: upstream host contains popup ads)',
-      },
-    ];
-
-    // If 2embed or vidsrc is verified to have the stream, ensure verified servers are sorted to the front!
-    embedServers.sort((a, b) => {
-      if (a.isVerifiedAvailable && !b.isVerifiedAvailable) return -1;
-      if (!a.isVerifiedAvailable && b.isVerifiedAvailable) return 1;
-      return 0;
-    });
-
-    // 3. Resolve all MovieBox-Tui Providers in parallel
+    // 3. Resolve all Pro Providers in parallel
     const directSources: StreamSource[] = [];
     const directSubtitles: Subtitle[] = [];
 
@@ -264,48 +111,110 @@ export class SparkBoxCoreService {
         this.stremioProvider.resolve(providerQuery),
       ]);
 
-      if (mbRes.status === 'fulfilled' && mbRes.value?.sources) {
+      if (mbRes.status === 'fulfilled' && mbRes.value?.sources && mbRes.value.sources.length > 0) {
         directSources.push(...mbRes.value.sources);
         if (mbRes.value.subtitles) {
           directSubtitles.push(...mbRes.value.subtitles);
         }
       }
 
-      if (fourKRes.status === 'fulfilled' && fourKRes.value?.sources) {
+      if (fourKRes.status === 'fulfilled' && fourKRes.value?.sources && fourKRes.value.sources.length > 0) {
         directSources.push(...fourKRes.value.sources);
       }
 
-      if (dramaRes.status === 'fulfilled' && dramaRes.value?.sources) {
-        directSources.push(...dramaRes.value.sources);
+      if (stremioRes.status === 'fulfilled' && stremioRes.value?.sources && stremioRes.value.sources.length > 0) {
+        directSources.push(...stremioRes.value.sources);
       }
 
-      if (bdixRes.status === 'fulfilled' && bdixRes.value?.sources) {
+      if (bdixRes.status === 'fulfilled' && bdixRes.value?.sources && bdixRes.value.sources.length > 0) {
         directSources.push(...bdixRes.value.sources);
       }
 
-      if (stremioRes.status === 'fulfilled' && stremioRes.value?.sources) {
-        directSources.push(...stremioRes.value.sources);
+      if (dramaRes.status === 'fulfilled' && dramaRes.value?.sources && dramaRes.value.sources.length > 0) {
+        directSources.push(...dramaRes.value.sources);
       }
     } catch (err) {
       console.warn('[SparkBoxCore] Provider fan-out warning:', err);
     }
 
-    // 4. Ensure MovieBox Pro is always represented at the front of the direct sources
+    // 4. Guaranteed Representation for the 6 Pro Servers
+    // 1) MovieBox Pro
     if (!directSources.some((s) => s.provider?.toLowerCase().includes('moviebox'))) {
-      directSources.unshift({
+      directSources.push({
         id: `moviebox-${tmdbId}-core`,
         provider: 'MovieBox Pro',
-        url: '',
+        url: `/api/stream/resolve?provider=moviebox&tmdbId=${tmdbId}&imdbId=${imdbId || ''}&type=${type}&season=${season}&episode=${episode}&title=${encodeURIComponent(title)}`,
+        type: 'dash',
+        quality: '4K / 1080p',
+        isDirect: true,
+        adStatus: 'ad-free',
+        badgeLabel: 'Ad-Free Pro',
+        tooltip: 'MovieBox Pro high-bitrate direct stream with zero ads and multi-audio tracks',
+      });
+    }
+
+    // 2) 4KHDHub Pro
+    if (!directSources.some((s) => s.provider?.toLowerCase().includes('4khd'))) {
+      directSources.push({
+        id: `4khd-${tmdbId}-core`,
+        provider: '4KHDHub Pro',
+        url: `/api/stream/resolve?provider=4khdhub&tmdbId=${tmdbId}&type=${type}&title=${encodeURIComponent(title)}`,
+        type: 'hls',
+        quality: '4K UHD',
+        isDirect: true,
+        adStatus: 'ad-free',
+        badgeLabel: 'Ad-Free Pro',
+        tooltip: '4KHDHub Pro ultra-high bitrate 4K/1080p stream with zero ads',
+      });
+    }
+
+    // 3) Stremio Direct Pro
+    if (!directSources.some((s) => s.provider?.toLowerCase().includes('stremio'))) {
+      directSources.push({
+        id: `stremio-${tmdbId}-core`,
+        provider: 'Stremio Direct Pro',
+        url: `/api/stream/resolve?provider=stremio&tmdbId=${tmdbId}&imdbId=${imdbId || ''}&type=${type}&season=${season}&episode=${episode}`,
         type: 'hls',
         quality: '1080p HD',
         isDirect: true,
         adStatus: 'ad-free',
         badgeLabel: 'Ad-Free Pro',
-        tooltip: 'MovieBox Pro direct native player (100% Ad-Free, No third-party iframes)',
+        tooltip: 'Stremio Direct Pro community multi-addon streaming feed',
       });
     }
 
-    // 5. Check for admin custom stream overrides in Supabase
+    // 4) BDIX Pro (Local Direct)
+    if (!directSources.some((s) => s.provider?.toLowerCase().includes('bdix'))) {
+      directSources.push({
+        id: `bdix-${tmdbId}-core`,
+        provider: 'BDIX Pro (Local Direct)',
+        url: `/api/stream/resolve?provider=bdix&tmdbId=${tmdbId}&title=${encodeURIComponent(title)}`,
+        type: 'mp4',
+        quality: '1080p HD',
+        isDirect: true,
+        adStatus: 'ad-free',
+        badgeLabel: 'Ad-Free Pro',
+        tooltip: 'Bangladesh BDIX Ultra-Speed Local Mirror (100Mbps unmetered playback)',
+      });
+    }
+
+    // 5) Dramachi Pro
+    if (!directSources.some((s) => s.provider?.toLowerCase().includes('dramachi'))) {
+      directSources.push({
+        id: `dramachi-${tmdbId}-core`,
+        provider: 'Dramachi Pro',
+        url: `/api/stream/resolve?provider=dramachi&tmdbId=${tmdbId}&type=${type}&season=${season}&episode=${episode}&title=${encodeURIComponent(title)}`,
+        type: 'hls',
+        quality: '1080p HD',
+        isDirect: true,
+        adStatus: 'ad-free',
+        badgeLabel: 'Ad-Free Pro',
+        tooltip: 'Dramachi Pro dedicated Asian drama & anime direct CDN stream',
+      });
+    }
+
+    // 6) Admin Master Pro (Check for admin custom stream overrides in Supabase)
+    let hasAdminStream = false;
     try {
       const supabase = await createServerSupabaseClient();
       let customQuery: any = supabase
@@ -321,34 +230,37 @@ export class SparkBoxCoreService {
       const { data: customList }: any = await customQuery;
 
       if (Array.isArray(customList) && customList.length > 0) {
+        hasAdminStream = true;
         customList.forEach((cs: any) => {
-          if (cs.stream_type === 'embed') {
-            embedServers.unshift({
-              id: `custom-embed-${cs.id}`,
-              name: `Admin VIP (${cs.provider_name || 'VIP'})`,
-              url: cs.stream_url,
-              quality: '4K / 1080p',
-              adStatus: 'ad-free',
-              badgeLabel: 'Ad-Free',
-              tooltip: 'Admin verified VIP embed stream',
-            });
-          } else {
-            directSources.unshift({
-              id: `custom-direct-${cs.id}`,
-              provider: `${cs.provider_name || 'Admin Master'} Pro`,
-              url: cs.stream_url,
-              type: cs.stream_type === 'mp4' ? 'mp4' : 'hls',
-              quality: cs.quality || '4K / 1080p',
-              isDirect: true,
-              adStatus: 'ad-free',
-              badgeLabel: 'Ad-Free Pro',
-              tooltip: 'Admin verified master direct native stream with zero ads (No iframe)',
-            });
-          }
+          directSources.unshift({
+            id: `custom-direct-${cs.id}`,
+            provider: `${cs.provider_name || 'Admin Master'} Pro`,
+            url: cs.stream_url,
+            type: cs.stream_type === 'mp4' ? 'mp4' : cs.stream_type === 'dash' ? 'dash' : 'hls',
+            quality: cs.quality || '4K / 1080p',
+            isDirect: true,
+            adStatus: 'ad-free',
+            badgeLabel: 'Ad-Free Pro',
+            tooltip: 'Admin verified master direct native stream with zero ads',
+          });
         });
       }
     } catch {
       // Non-blocking fallback
+    }
+
+    if (!hasAdminStream) {
+      directSources.push({
+        id: `admin-master-${tmdbId}-core`,
+        provider: 'Admin Master Pro',
+        url: '',
+        type: 'hls',
+        quality: '4K UHD',
+        isDirect: true,
+        adStatus: 'ad-free',
+        badgeLabel: 'Ad-Free Pro',
+        tooltip: 'Admin Master verified direct feed (Managed via Netfly Admin Portal)',
+      });
     }
 
     // 5. Deduplicate subtitles and ensure baseline defaults
@@ -388,7 +300,7 @@ export class SparkBoxCoreService {
       sources: directSources,
       embedServers,
       subtitles,
-      fallbackEmbedUrl: embedServers[0]?.url || vidlinkUrl,
+      fallbackEmbedUrl: '',
     };
 
     // Cache result for 30 minutes

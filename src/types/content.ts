@@ -75,9 +75,9 @@ export type ContentItem = Movie | (TVShow & { title?: string; release_date?: str
 
 export interface StreamSource {
   id: string;
-  provider: string; // e.g., "MovieBox", "WeFeed", "VidSrc", "SuperEmbed"
+  provider: string; // e.g., "MovieBox Pro", "4KHDHub Pro", "Stremio Direct Pro", "BDIX Pro", "Dramachi Pro", "Admin Master Pro"
   url: string;
-  type: "hls" | "mp4";
+  type: "hls" | "mp4" | "dash";
   quality: string;
   isDirect: boolean;
   headers?: Record<string, string>; // Referer, User-Agent, etc.

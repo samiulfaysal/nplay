@@ -34,14 +34,47 @@ export async function GET(request: NextRequest) {
     const isSuccess = upstreamRes.status === 200 || upstreamRes.status === 206;
     const rawContentType = upstreamRes.headers.get('content-type') || '';
     const isM3u8 = targetUrl.includes('.m3u8');
+    const isMpd = targetUrl.includes('.mpd');
     const isHtmlOrJson = rawContentType.includes('text/html') || rawContentType.includes('application/json');
 
     // If upstream failed or returned an error page/json instead of media
-    if (!isSuccess || (isHtmlOrJson && !isM3u8)) {
+    if (!isSuccess || (isHtmlOrJson && !isM3u8 && !isMpd)) {
       return NextResponse.json(
         { error: 'Upstream stream unavailable or returned non-media response' },
         { status: 404 }
       );
+    }
+
+    if (isMpd) {
+      const text = await upstreamRes.text();
+      const lastSlashIdx = targetUrl.lastIndexOf('/');
+      const baseDir = lastSlashIdx !== -1 ? targetUrl.substring(0, lastSlashIdx + 1) : targetUrl;
+      const proxyPrefix = `/api/stream/proxy?ref=${encodeURIComponent(referer)}${cookie ? '&cookie=' + encodeURIComponent(cookie) : ''}&url=`;
+
+      // Rewrite initialization, media, and BaseURL in SegmentTemplate
+      let rewritten = text
+        .replace(/initialization="([^"]+)"/g, (match, initPath) => {
+          if (initPath.startsWith('http://') || initPath.startsWith('https://')) {
+            return `initialization="${proxyPrefix}${encodeURIComponent(initPath)}"`;
+          }
+          return `initialization="${proxyPrefix}${encodeURIComponent(baseDir + initPath)}"`;
+        })
+        .replace(/media="([^"]+)"/g, (match, mediaPath) => {
+          if (mediaPath.startsWith('http://') || mediaPath.startsWith('https://')) {
+            return `media="${proxyPrefix}${encodeURIComponent(mediaPath)}"`;
+          }
+          return `media="${proxyPrefix}${encodeURIComponent(baseDir)}${mediaPath}"`;
+        });
+
+      return new NextResponse(rewritten, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/dash+xml',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
+          'Cache-Control': 'no-cache',
+        },
+      });
     }
 
     let contentType = rawContentType;
