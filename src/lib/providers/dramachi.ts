@@ -74,8 +74,8 @@ export class DramachiProvider implements IStreamingProvider {
 
                       if (fileRes.ok) {
                         const fileData = await fileRes.json();
-                        const host = fileData?.host_info?.host;
-                        const fileUrl = fileData?.file_info?.[0]?.url;
+                        const host = fileData?.hostInfo?.host || fileData?.host_info?.host;
+                        const fileUrl = fileData?.fileInfo?.[0]?.url || fileData?.file_info?.[0]?.url;
 
                         if (host && fileUrl) {
                           const directStream = `https://${host.replace(/\/$/, '')}/cdn/${fileUrl.replace(/^\//, '')}`;
