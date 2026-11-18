@@ -16,6 +16,7 @@ import { SparkBoxCore } from '@/lib/providerCore';
 import { VideoPlayer } from '@/components/player/VideoPlayer';
 import { MovieGrid } from '@/components/movies/MovieGrid';
 import { SeasonEpisodeSelector } from '@/components/player/SeasonEpisodeSelector';
+import { MovyWatchHero } from '@/components/movies/MovyWatchHero';
 import { WatchlistButton } from '@/components/movies/WatchlistButton';
 import { WatchTrailerButton } from '@/components/modals/WatchTrailerButton';
 import { ShareButton } from '@/components/movies/ShareButton';
@@ -182,58 +183,58 @@ export default async function WatchPage({ params, searchParams }: WatchPageProps
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2.5 sm:pt-4 md:pt-6 space-y-4 sm:space-y-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 sm:pt-6 space-y-6 sm:space-y-8">
+        {/* Movy Cinematic Hero Details Showcase */}
+        <MovyWatchHero
+          id={id}
+          type={isTv ? 'tv' : 'movie'}
+          title={title}
+          releaseYear={releaseYear}
+          duration={content.formatted_duration || (isTv ? 'Season Series' : '2h 05m')}
+          rating={content.vote_average || 8.0}
+          quality={content.quality || '4K UHD'}
+          overview={content.overview || ''}
+          backdropUrl={backdropUrl}
+          posterUrl={posterUrl}
+          genres={content.genres || []}
+          country={content.country}
+          isTv={isTv}
+          season={verifiedSeason}
+          episode={verifiedEpisode}
+          trailerKey={content.trailer_key}
+          item={content}
+        />
+
         {/* 1. Main Streaming Video Player Section */}
-        <section className="space-y-2.5 sm:space-y-3.5">
-          <div className="flex items-center justify-between gap-2.5 border-b border-white/5 pb-2 sm:pb-3">
+        <section id="player-viewport" className="space-y-2.5 sm:space-y-3.5 scroll-mt-6">
+          <div className="flex items-center justify-between gap-2.5 border-b border-white/[0.08] pb-2.5 sm:pb-3">
             <div className="space-y-0.5 min-w-0">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] font-black uppercase bg-red-600 text-white shadow-sm shrink-0">
-                  {content.quality || 'HD 1080P'}
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-2 py-0.5 rounded text-[11px] font-black uppercase tracking-wider bg-red-600 text-white shadow-sm shrink-0">
+                  {content.quality || '4K UHD'}
                 </span>
-                <span className="px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] font-bold uppercase bg-white/10 text-gray-200 border border-white/5 shrink-0">
-                  {isTv ? 'TV Series' : 'Movie'}
+                <span className="px-2 py-0.5 rounded text-[11px] font-bold uppercase bg-white/10 text-gray-200 border border-white/5 shrink-0">
+                  {isTv ? `Season ${verifiedSeason} · Episode ${verifiedEpisode}` : 'Direct Pro Stream'}
                 </span>
                 <div className="flex items-center gap-1 text-amber-400 font-bold text-xs shrink-0">
                   <Star className="w-3.5 h-3.5 fill-amber-400" />
                   <span>{content.vote_average?.toFixed(1) || '8.0'}</span>
                 </div>
-                <span className="text-gray-400 text-xs hidden sm:inline">•</span>
-                <span className="text-gray-400 text-xs hidden sm:inline">{releaseYear}</span>
-                <span className="text-gray-400 text-xs hidden sm:inline">•</span>
-                <span className="text-gray-400 text-xs hidden sm:inline">
-                  {content.formatted_duration || (isTv ? 'Season Series' : '2h 05m')}
-                </span>
-                {imdbId && (
-                  <span className="px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] font-mono font-medium bg-white/5 text-gray-300 border border-white/10 shrink-0">
-                    IMDb: {imdbId}
-                  </span>
-                )}
               </div>
-              <h1 className="text-base sm:text-2xl md:text-3xl font-black text-white tracking-wide truncate">
-                {title}
-                {isTv && (
-                  <span className="text-red-500 text-xs sm:text-xl font-bold ml-1.5">
-                    (S{verifiedSeason} E{verifiedEpisode})
-                  </span>
-                )}
-              </h1>
+              <h2 className="text-sm sm:text-lg font-bold text-white tracking-wide truncate">
+                {title} {isTv && `— S${verifiedSeason} E${verifiedEpisode}`}
+              </h2>
             </div>
 
-            {/* Top Action Controls: Trailer, Watchlist Bookmark, Share */}
+            {/* Quick Top Controls */}
             <div className="flex items-center gap-1.5 shrink-0">
-              {/* Watch Official Trailer Button */}
               <WatchTrailerButton
                 title={title}
                 tmdbId={id}
                 mediaType={type}
                 trailerKey={content.trailer_key}
               />
-
-              {/* Bookmark / Watchlist Button */}
               <WatchlistButton item={content} variant="header" />
-
-              {/* Working Share Button */}
               <ShareButton title={title} />
             </div>
           </div>

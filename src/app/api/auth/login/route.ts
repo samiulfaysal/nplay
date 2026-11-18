@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const adminEmail = (process.env.ADMIN_EMAIL || 'admin@netfly.tv').trim().toLowerCase();
+    const adminEmail = (process.env.ADMIN_EMAIL || 'admin@nplay.tv').trim().toLowerCase();
     const adminPassword = (process.env.ADMIN_PASSWORD || 'Admin@123456').trim();
     const inputEmail = email.trim().toLowerCase();
 

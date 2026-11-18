@@ -9,6 +9,8 @@ import {
   VolumeX,
   Maximize,
   RotateCw,
+  RotateCcw,
+  SkipForward,
   Server,
   Zap,
   ChevronLeft,
@@ -243,6 +245,40 @@ export function VideoPlayer({
     }
   };
 
+  const handleSkip = (seconds: number) => {
+    if (!videoRef.current) return;
+    const newTime = Math.max(0, Math.min(duration, videoRef.current.currentTime + seconds));
+    videoRef.current.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
+
+  // Keyboard Hotkeys (Space, ArrowLeft, ArrowRight, F, M)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        togglePlay();
+      } else if (e.code === 'ArrowRight') {
+        e.preventDefault();
+        handleSkip(10);
+      } else if (e.code === 'ArrowLeft') {
+        e.preventDefault();
+        handleSkip(-10);
+      } else if (e.code === 'KeyF') {
+        e.preventDefault();
+        toggleFullscreen();
+      } else if (e.code === 'KeyM') {
+        e.preventDefault();
+        toggleMute();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPlaying, duration]);
+
   const toggleFullscreen = () => {
     if (!containerRef.current) return;
     if (!document.fullscreenElement) {
@@ -416,10 +452,11 @@ export function VideoPlayer({
           />
 
           <div className="flex items-center justify-between text-white text-xs sm:text-sm">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <button
                 onClick={togglePlay}
                 className="hover:text-red-400 transition-colors"
+                title={isPlaying ? "Pause (Space)" : "Play (Space)"}
               >
                 {isPlaying ? (
                   <Pause className="w-5 h-5 fill-current" />
@@ -429,8 +466,25 @@ export function VideoPlayer({
               </button>
 
               <button
+                onClick={() => handleSkip(-10)}
+                className="hover:text-red-400 text-gray-300 transition-colors p-1"
+                title="Rewind 10s (←)"
+              >
+                <RotateCcw className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => handleSkip(10)}
+                className="hover:text-red-400 text-gray-300 transition-colors p-1"
+                title="Forward 10s (→)"
+              >
+                <RotateCw className="w-4 h-4" />
+              </button>
+
+              <button
                 onClick={toggleMute}
                 className="hover:text-red-400 transition-colors"
+                title={isMuted ? "Unmute (M)" : "Mute (M)"}
               >
                 {isMuted ? (
                   <VolumeX className="w-5 h-5" />
@@ -439,12 +493,24 @@ export function VideoPlayer({
                 )}
               </button>
 
-              <span className="text-gray-300 font-medium text-xs">
+              <span className="text-gray-300 font-medium text-xs font-mono">
                 {formatTime(currentTime)} / {formatTime(duration)}
               </span>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              {isTv && onNextEpisode && (
+                <button
+                  type="button"
+                  onClick={onNextEpisode}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white text-[11px] font-bold transition-all shadow-md active:scale-95"
+                  title="Play Next Episode"
+                >
+                  <SkipForward className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Next Ep</span>
+                </button>
+              )}
+
               <span className="px-2 py-0.5 rounded bg-white/10 text-[11px] font-bold text-gray-300">
                 {activeSource?.quality || '1080P'}
               </span>
@@ -452,6 +518,7 @@ export function VideoPlayer({
               <button
                 onClick={toggleFullscreen}
                 className="hover:text-red-400 transition-colors"
+                title="Fullscreen (F)"
               >
                 <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>

@@ -5,9 +5,10 @@ import { Share2, Check } from 'lucide-react';
 
 interface ShareButtonProps {
   title: string;
+  className?: string;
 }
 
-export function ShareButton({ title }: ShareButtonProps) {
+export function ShareButton({ title, className = '' }: ShareButtonProps) {
   const [copied, setCopied] = useState(false);
 
   const handleShare = async () => {
@@ -41,7 +42,7 @@ export function ShareButton({ title }: ShareButtonProps) {
       <button
         type="button"
         onClick={handleShare}
-        className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-gray-200 transition-colors border border-white/5 active:scale-95"
+        className={className || "flex items-center gap-1 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-gray-200 transition-colors border border-white/5 active:scale-95"}
         title="Share link"
       >
         {copied ? (

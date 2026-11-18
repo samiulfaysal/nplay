@@ -18,7 +18,7 @@ interface WatchlistButtonProps {
     first_air_date?: string;
     overview?: string;
   };
-  variant?: 'hero' | 'header' | 'icon';
+  variant?: 'hero' | 'header' | 'icon' | 'circle' | 'glass-round';
   className?: string;
 }
 
@@ -61,6 +61,30 @@ export function WatchlistButton({
       setToastMessage(null);
     }, 2000);
   };
+
+  if (variant === 'circle' || variant === 'glass-round') {
+    return (
+      <div className="relative inline-block">
+        <button
+          type="button"
+          onClick={handleClick}
+          title={inList ? 'Remove from My List' : 'Save to My List'}
+          className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center transition-all active:scale-95 ${
+            inList
+              ? 'bg-red-600/30 text-red-400 border border-red-500 shadow-lg shadow-red-600/20'
+              : 'bg-white/10 hover:bg-white/20 text-white border border-white/15 backdrop-blur-md'
+          } ${className}`}
+        >
+          {inList ? <Check className="w-4 h-4 sm:w-5 sm:h-5 text-red-400" /> : <Bookmark className="w-4 h-4 sm:w-5 sm:h-5" />}
+        </button>
+        {toastMessage && (
+          <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-black/90 text-white text-[11px] font-bold px-3 py-1 rounded-full border border-red-500/50 shadow-xl whitespace-nowrap animate-in fade-in slide-in-from-bottom-2 duration-150 z-50">
+            {toastMessage}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   if (variant === 'hero') {
     return (

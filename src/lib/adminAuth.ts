@@ -20,7 +20,7 @@ export interface AdminAuthResult {
  * 4. Fallback dev mode allowance if no auth setup
  */
 export async function verifyAdmin(): Promise<AdminAuthResult> {
-  const adminEmailEnv = (process.env.ADMIN_EMAIL || 'admin@netfly.tv').trim().toLowerCase();
+  const adminEmailEnv = (process.env.ADMIN_EMAIL || 'admin@nplay.tv').trim().toLowerCase();
 
   try {
     // 1. Check for dedicated Admin session cookie
@@ -52,7 +52,7 @@ export async function verifyAdmin(): Promise<AdminAuthResult> {
           isAdmin: true,
           user: {
             id: 'dev-admin-id',
-            email: 'admin@netfly.tv (Dev Mode)',
+            email: 'admin@nplay.tv (Dev Mode)',
             username: 'MasterAdmin',
           },
         };
