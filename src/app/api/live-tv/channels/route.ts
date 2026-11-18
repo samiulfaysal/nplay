@@ -82,11 +82,11 @@ const CURATED_CHANNELS: LiveChannel[] = [
   // Entertainment & Cinema
   {
     id: 'bsp-cinema',
-    name: 'Netfly 24/7 Cinema Stream',
+    name: 'nPlay 24/7 Cinema Stream',
     group: 'Movies',
     logo: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=320&q=80',
     streamUrl: 'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
-    country: 'Netfly Original',
+    country: 'nPlay Original',
   },
   {
     id: 'rakuten-action',

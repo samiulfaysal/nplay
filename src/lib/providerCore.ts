@@ -186,7 +186,20 @@ export class SparkBoxCoreService {
 
     const finalSources: StreamSource[] = [];
 
-    // 1) Direct Native Stream (if available via MovieBox or Admin)
+    // 1) VidPrime VIP (Primary, Instant 1080p Playback)
+    finalSources.push({
+      id: `vidsrc-pm-${tmdbId}`,
+      provider: 'VidPrime VIP (Smooth 1080p)',
+      url: vidsrcPmUrl,
+      type: 'hls',
+      quality: '1080p HD',
+      isDirect: false,
+      adStatus: 'ad-free',
+      badgeLabel: 'Ad-Free Pro',
+      tooltip: 'VidPrime high-performance streaming mirror with instant buffer-free playback',
+    });
+
+    // 2) Direct Native Stream (if available via MovieBox Core)
     if (directStreamUrl) {
       finalSources.push({
         id: `direct-native-${tmdbId}`,
@@ -200,19 +213,6 @@ export class SparkBoxCoreService {
         tooltip: 'High-speed direct native HLS stream',
       });
     }
-
-    // 2) VidPrime VIP (Primary, Instant 1080p Playback)
-    finalSources.push({
-      id: `vidsrc-pm-${tmdbId}`,
-      provider: 'VidPrime VIP (Smooth 1080p)',
-      url: vidsrcPmUrl,
-      type: 'hls',
-      quality: '1080p HD',
-      isDirect: false,
-      adStatus: 'ad-free',
-      badgeLabel: 'Ad-Free Pro',
-      tooltip: 'VidPrime high-performance streaming mirror with instant buffer-free playback',
-    });
 
     // 3) MultiEmbed VIP (Multi-CDN)
     finalSources.push({

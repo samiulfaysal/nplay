@@ -32,7 +32,7 @@ const DEFAULT_SETTINGS: AppSettings = {
     process.env.NEXT_PUBLIC_TMDB_API_KEY ||
     process.env.TMDB_API_KEY ||
     '',
-  adminEmail: (process.env.ADMIN_EMAIL || 'admin@netfly.tv').trim().toLowerCase(),
+  adminEmail: (process.env.ADMIN_EMAIL || 'admin@nplay.tv').trim().toLowerCase(),
   adminPassword: process.env.ADMIN_PASSWORD || 'Admin@123456',
   publicRegistration: true,
   serverVidsrc: 'https://vidsrc.to/embed/{type}/{tmdbId}',

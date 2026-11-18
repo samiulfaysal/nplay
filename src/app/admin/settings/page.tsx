@@ -366,7 +366,7 @@ export default function AdminSettingsPage() {
                 </span>
                 <button
                   type="button"
-                  onClick={() => handleCopy(adminEmail || 'admin@netfly.tv', 'adminEmail')}
+                  onClick={() => handleCopy(adminEmail || 'admin@nplay.tv', 'adminEmail')}
                   className="flex items-center gap-1 text-[11px] text-gray-400 hover:text-white transition-colors"
                 >
                   {copiedKey === 'adminEmail' ? (
@@ -378,7 +378,7 @@ export default function AdminSettingsPage() {
                 </button>
               </div>
               <div className="font-mono text-sm font-bold text-gray-100 select-all">
-                {adminEmail || 'admin@netfly.tv'}
+                {adminEmail || 'admin@nplay.tv'}
               </div>
             </div>
 

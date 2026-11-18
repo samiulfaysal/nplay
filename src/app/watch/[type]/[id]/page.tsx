@@ -61,10 +61,10 @@ export async function generateMetadata({
     : 'https://images.unsplash.com/photo-1574267432553-4b4628081c31?auto=format&fit=crop&w=1200&q=80';
 
   return {
-    title: `${title} (${releaseYear}) - Watch Free Online HD | Netfly`,
+    title: `${title} (${releaseYear}) - Watch Free Online HD | nPlay`,
     description: overview.slice(0, 160),
     openGraph: {
-      title: `${title} (${releaseYear}) - Stream Free in HD | Netfly`,
+      title: `${title} (${releaseYear}) - Stream Free in HD | nPlay`,
       description: overview.slice(0, 160),
       images: [
         {
@@ -78,7 +78,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${title} - Watch Free HD on Netfly`,
+      title: `${title} - Watch Free HD on nPlay`,
       description: overview.slice(0, 160),
       images: [backdrop],
     },

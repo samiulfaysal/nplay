@@ -82,17 +82,6 @@ export function MovyWatchHero({
     if (onPlayClick) {
       onPlayClick();
     }
-    // Automatically trigger fullscreen mode upon clicking Watch Now
-    setTimeout(() => {
-      const container = playerContainerRef.current;
-      if (container) {
-        if (container.requestFullscreen) {
-          container.requestFullscreen().catch(() => {});
-        } else if ((container as any).webkitRequestFullscreen) {
-          (container as any).webkitRequestFullscreen();
-        }
-      }
-    }, 120);
   };
 
   const formattedRating = typeof rating === 'number' ? rating.toFixed(1) : (rating || '8.0');

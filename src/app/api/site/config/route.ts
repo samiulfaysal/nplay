@@ -9,12 +9,12 @@ export async function GET() {
 
     return NextResponse.json({
       publicRegistration: settings.publicRegistration !== false,
-      adminEmail: settings.adminEmail || 'admin@netfly.tv',
+      adminEmail: settings.adminEmail || 'admin@nplay.tv',
     });
   } catch {
     return NextResponse.json({
       publicRegistration: true,
-      adminEmail: 'admin@netfly.tv',
+      adminEmail: 'admin@nplay.tv',
     });
   }
 }

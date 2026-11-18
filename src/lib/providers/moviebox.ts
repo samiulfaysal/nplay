@@ -278,9 +278,8 @@ export class MovieBoxProvider implements IStreamingProvider {
               const streamUrl = s.url || s.playUrl;
               if (!streamUrl) continue;
 
-              // Filter out short preview clips only when full stream is present
-              const isPreview = streamUrl.includes('/preview/') && rawStreams.length > 1;
-              if (isPreview) {
+              // Filter out short preview clips
+              if (streamUrl.includes('/preview/')) {
                 continue;
               }
 

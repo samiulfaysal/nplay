@@ -193,7 +193,7 @@ export default function LiveTvPage() {
               <Tv className="w-4 h-4" />
             </span>
             <h1 className="text-xl sm:text-2xl font-black text-white tracking-wider">
-              NETFLY <span className="text-red-500">LIVE TV</span>
+              nPLAY <span className="text-red-500">LIVE TV</span>
             </h1>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold text-[10px]">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
