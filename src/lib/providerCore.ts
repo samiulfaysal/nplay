@@ -278,16 +278,8 @@ export class SparkBoxCoreService {
       subtitles.push({
         language: 'en',
         label: 'English [CC]',
-        url: 'https://raw.githubusercontent.com/brenopolanski/html5-video-webvtt-example/master/subtitles/subtitles-en.vtt',
+        url: '/subtitles/en.vtt',
         default: true,
-      });
-    }
-
-    if (!seenSubLang.has('bn')) {
-      subtitles.push({
-        language: 'bn',
-        label: 'Bengali (বাংলা)',
-        url: 'https://raw.githubusercontent.com/brenopolanski/html5-video-webvtt-example/master/subtitles/subtitles-en.vtt',
       });
     }
 

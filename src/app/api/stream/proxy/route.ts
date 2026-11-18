@@ -51,19 +51,24 @@ export async function GET(request: NextRequest) {
       const baseDir = lastSlashIdx !== -1 ? targetUrl.substring(0, lastSlashIdx + 1) : targetUrl;
       const proxyPrefix = `/api/stream/proxy?ref=${encodeURIComponent(referer)}${cookie ? '&cookie=' + encodeURIComponent(cookie) : ''}&url=`;
 
-      // Rewrite initialization, media, and BaseURL in SegmentTemplate
-      let rewritten = text
-        .replace(/initialization="([^"]+)"/g, (match, initPath) => {
-          if (initPath.startsWith('http://') || initPath.startsWith('https://')) {
-            return `initialization="${proxyPrefix}${encodeURIComponent(initPath)}"`;
-          }
-          return `initialization="${proxyPrefix}${encodeURIComponent(baseDir + initPath)}"`;
+      const formatProxyTemplate = (filePath: string) => {
+        const full = filePath.startsWith('http') ? filePath : `${baseDir}${filePath}`;
+        const encoded = encodeURIComponent(full)
+          .replace(/%24RepresentationID%24/gi, () => '$RepresentationID$')
+          .replace(/%24Number%24/gi, () => '$Number$')
+          .replace(/%24Number%2505d%24/gi, () => '$Number%05d$')
+          .replace(/%24Time%24/gi, () => '$Time$')
+          .replace(/%24Bandwidth%24/gi, () => '$Bandwidth$');
+        return `${proxyPrefix}${encoded}`;
+      };
+
+      // Rewrite initialization and media in SegmentTemplate preserving DASH identifiers
+      const rewritten = text
+        .replace(/initialization="([^"]+)"/g, (_match, initPath) => {
+          return `initialization="${formatProxyTemplate(initPath)}"`;
         })
-        .replace(/media="([^"]+)"/g, (match, mediaPath) => {
-          if (mediaPath.startsWith('http://') || mediaPath.startsWith('https://')) {
-            return `media="${proxyPrefix}${encodeURIComponent(mediaPath)}"`;
-          }
-          return `media="${proxyPrefix}${encodeURIComponent(baseDir)}${mediaPath}"`;
+        .replace(/media="([^"]+)"/g, (_match, mediaPath) => {
+          return `media="${formatProxyTemplate(mediaPath)}"`;
         });
 
       return new NextResponse(rewritten, {
