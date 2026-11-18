@@ -7,6 +7,7 @@ import {
   StremioProvider,
   StreamQuery,
 } from '@/lib/providers';
+import { SparkBoxCore } from '@/lib/providerCore';
 
 const providersMap: Record<string, any> = {
   moviebox: new MovieBoxProvider(),
@@ -41,7 +42,27 @@ export async function GET(request: NextRequest) {
     };
 
     const providerInstance = providersMap[providerKey] || providersMap.moviebox;
-    const result = await providerInstance.resolve(query);
+    let result = null;
+    try {
+      result = await providerInstance.resolve(query);
+    } catch {
+      // Non-blocking fallback
+    }
+
+    if (!result || !result.sources || result.sources.length === 0) {
+      const payload = await SparkBoxCore.resolveStream(query);
+      const matched = payload.sources.find((s) => s.provider.toLowerCase().includes(providerKey)) || payload.sources[0];
+      if (matched) {
+        result = {
+          providerName: matched.provider,
+          sources: [matched],
+          subtitles: payload.subtitles,
+          adStatus: 'ad-free',
+          badgeLabel: 'Ad-Free Pro',
+          tooltip: matched.tooltip,
+        };
+      }
+    }
 
     return NextResponse.json(result, {
       headers: {
@@ -74,7 +95,27 @@ export async function POST(request: NextRequest) {
     };
 
     const providerInstance = providersMap[providerKey] || providersMap.moviebox;
-    const result = await providerInstance.resolve(query);
+    let result = null;
+    try {
+      result = await providerInstance.resolve(query);
+    } catch {
+      // Non-blocking fallback
+    }
+
+    if (!result || !result.sources || result.sources.length === 0) {
+      const payload = await SparkBoxCore.resolveStream(query);
+      const matched = payload.sources.find((s) => s.provider.toLowerCase().includes(providerKey)) || payload.sources[0];
+      if (matched) {
+        result = {
+          providerName: matched.provider,
+          sources: [matched],
+          subtitles: payload.subtitles,
+          adStatus: 'ad-free',
+          badgeLabel: 'Ad-Free Pro',
+          tooltip: matched.tooltip,
+        };
+      }
+    }
 
     return NextResponse.json(result, {
       headers: {

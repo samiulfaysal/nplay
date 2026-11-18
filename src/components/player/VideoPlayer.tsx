@@ -163,6 +163,12 @@ export function VideoPlayer({
             streaming: {
               buffer: {
                 fastSwitchEnabled: true,
+                initialBufferLength: 0.5,
+                stableBufferTime: 10,
+                bufferTimeAtTopQuality: 15,
+              },
+              abr: {
+                autoSwitchBitrate: { video: true },
               },
             },
           });
@@ -354,6 +360,7 @@ export function VideoPlayer({
         <video
           ref={videoRef}
           poster={poster}
+          preload="auto"
           onTimeUpdate={handleTimeUpdate}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
