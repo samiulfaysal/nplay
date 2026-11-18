@@ -1,0 +1,15 @@
+{
+  "supabaseUrl": "https://tacbfwheoaqbhmyvxnsb.supabase.co",
+  "supabaseAnonKey": "sb_publishable_EnNVv_mWFj7sMKzOtXdBBw_oDDFo4wD",
+  "tmdbApiKey": "4e44d9029b1270a757cddc766a1bcb63",
+  "adminEmail": "admin@netfly.tv",
+  "adminPassword": "Admin@123456",
+  "publicRegistration": false,
+  "serverVidsrc": "https://vidsrc.to/embed/{type}/{tmdbId}",
+  "serverAutoembed": "https://multiembed.mov/?video_id={tmdbId}&tmdb=1",
+  "serverTwoEmbed": "https://www.2embed.cc/embed/{tmdbId}",
+  "serverCinejoy": "https://vidsrc.me/embed/{type}?tmdb={tmdbId}",
+  "serverFmovies": "https://autoembed.co/{type}/tmdb/{tmdbId}",
+  "serverNet77": "https://vidsrc.xyz/embed/{type}?tmdb={tmdbId}",
+  "serverFlixora": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+}

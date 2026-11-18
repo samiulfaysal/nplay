@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="512" height="512">
+  <defs>
+    <linearGradient id="netflyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF2A3C" />
+      <stop offset="50%" stop-color="#E50914" />
+      <stop offset="100%" stop-color="#8B0000" />
+    </linearGradient>
+    <linearGradient id="netflyFold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#600008" />
+      <stop offset="100%" stop-color="#B80710" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#E50914" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect width="100" height="100" rx="24" fill="#0a0a0f" />
+  <g filter="url(#glow)">
+    <!-- Left Vertical Pillar -->
+    <path
+      d="M18 82V24C18 19.5 21.5 16 26 16C28.5 16 30.8 17.2 32.3 19.2L35 23V72L18 82Z"
+      fill="url(#netflyFold)"
+    />
+    <!-- Right Vertical Pillar -->
+    <path
+      d="M82 18V76C82 80.5 78.5 84 74 84C71.5 84 69.2 82.8 67.7 80.8L65 77V28L82 18Z"
+      fill="url(#netflyFold)"
+    />
+    <!-- Flowing Crimson Diagonal Ribbon -->
+    <path
+      d="M18 28C18 19 26 15 33 21L82 72C82 81 74 85 67 79L18 28Z"
+      fill="url(#netflyGrad)"
+    />
+  </g>
+</svg>
