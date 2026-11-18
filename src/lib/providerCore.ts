@@ -148,85 +148,140 @@ export class SparkBoxCoreService {
       // Non-blocking fallback
     }
 
-    // 4. Guaranteed Active Stream Delivery across all 6 Pro Servers
-    const mainStream = directSources[0] || null;
-    const streamUrl = mainStream?.url || '';
-    const streamType = mainStream?.type || 'dash';
+    // 4. Guaranteed Active Stream Delivery across High-Speed VIP Servers
+    const isTv = type === 'tv';
 
-    const finalSources: StreamSource[] = [
-      // 1) MovieBox Pro
-      {
-        id: `moviebox-${tmdbId}-core`,
-        provider: 'MovieBox Pro',
-        url: streamUrl,
-        type: streamType,
+    // 1) VidPrime / VidSrc Pro (Fast, High Bitrate, Ultra-Smooth)
+    const vidsrcPmUrl = isTv
+      ? `https://vidsrc.pm/embed/tv/${tmdbId}/${season}/${episode}`
+      : `https://vidsrc.pm/embed/movie/${tmdbId}`;
+
+    // 2) MultiEmbed VIP (Multi-server Fast CDN)
+    const multiEmbedUrl = isTv
+      ? `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${season}&e=${episode}`
+      : `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
+
+    // 3) VidSrc Official VIP
+    const vidsrcToUrl = isTv
+      ? `https://vidsrc.to/embed/tv/${tmdbId}/${season}/${episode}`
+      : `https://vidsrc.to/embed/movie/${tmdbId}`;
+
+    // 4) 2Embed Pro VIP
+    const twoEmbedUrl = isTv
+      ? `https://www.2embed.cc/embedtv/${tmdbId}&s=${season}&e=${episode}`
+      : `https://www.2embed.cc/embed/${tmdbId}`;
+
+    // 5) AutoEmbed VIP
+    const autoembedUrl = isTv
+      ? `https://autoembed.co/tv/tmdb/${tmdbId}-${season}-${episode}`
+      : `https://autoembed.co/movie/tmdb/${tmdbId}`;
+
+    // 6) VidLink Pro (With multi-subtitles)
+    const vidlinkUrl = isTv
+      ? `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}`
+      : `https://vidlink.pro/movie/${tmdbId}`;
+
+    const mainStream = directSources[0] || null;
+    const directStreamUrl = mainStream?.url || '';
+
+    const finalSources: StreamSource[] = [];
+
+    // 1) Direct Native Stream (if available via MovieBox or Admin)
+    if (directStreamUrl) {
+      finalSources.push({
+        id: `direct-native-${tmdbId}`,
+        provider: 'Direct Stream VIP',
+        url: directStreamUrl,
+        type: mainStream?.type || 'hls',
         quality: '1080p HD',
         isDirect: true,
         adStatus: 'ad-free',
         badgeLabel: 'Ad-Free Pro',
-        tooltip: 'MovieBox Pro high-bitrate direct native stream (Ad-Free, Ultra-Low Latency)',
-      },
-      // 2) 4KHDHub Pro
-      {
-        id: `4khd-${tmdbId}-core`,
-        provider: '4KHDHub Pro',
-        url: streamUrl,
-        type: streamType,
-        quality: '4K UHD',
-        isDirect: true,
-        adStatus: 'ad-free',
-        badgeLabel: 'Ad-Free Pro',
-        tooltip: '4KHDHub Pro ultra-high bitrate 4K/1080p stream with zero ads',
-      },
-      // 3) Stremio Direct Pro
-      {
-        id: `stremio-${tmdbId}-core`,
-        provider: 'Stremio Direct Pro',
-        url: streamUrl,
-        type: streamType,
-        quality: '1080p HD',
-        isDirect: true,
-        adStatus: 'ad-free',
-        badgeLabel: 'Ad-Free Pro',
-        tooltip: 'Stremio Direct Pro community multi-addon streaming feed with English subtitles',
-      },
-      // 4) BDIX Pro (Local Direct)
-      {
-        id: `bdix-${tmdbId}-core`,
-        provider: 'BDIX Pro (Local Direct)',
-        url: streamUrl,
-        type: streamType,
-        quality: '1080p HD',
-        isDirect: true,
-        adStatus: 'ad-free',
-        badgeLabel: 'Ad-Free Pro',
-        tooltip: 'Bangladesh BDIX Ultra-Speed Local Mirror (100Mbps unmetered playback)',
-      },
-      // 5) Dramachi Pro
-      {
-        id: `dramachi-${tmdbId}-core`,
-        provider: 'Dramachi Pro',
-        url: streamUrl,
-        type: streamType,
-        quality: '1080p HD',
-        isDirect: true,
-        adStatus: 'ad-free',
-        badgeLabel: 'Ad-Free Pro',
-        tooltip: 'Dramachi Pro dedicated fast CDN direct stream',
-      },
-      // 6) Admin Master Pro
-      adminStream || {
-        id: `admin-master-${tmdbId}-core`,
-        provider: 'Admin Master Pro',
-        url: streamUrl,
-        type: streamType,
-        quality: '4K UHD',
-        isDirect: true,
-        adStatus: 'ad-free',
-        badgeLabel: 'Ad-Free Pro',
-        tooltip: 'Admin Master verified VIP direct stream with zero ads',
-      },
-    ];
+        tooltip: 'High-speed direct native HLS stream',
+      });
+    }
+
+    // 2) VidPrime VIP (Primary, Instant 1080p Playback)
+    finalSources.push({
+      id: `vidsrc-pm-${tmdbId}`,
+      provider: 'VidPrime VIP (Smooth 1080p)',
+      url: vidsrcPmUrl,
+      type: 'hls',
+      quality: '1080p HD',
+      isDirect: false,
+      adStatus: 'ad-free',
+      badgeLabel: 'Ad-Free Pro',
+      tooltip: 'VidPrime high-performance streaming mirror with instant buffer-free playback',
+    });
+
+    // 3) MultiEmbed VIP (Multi-CDN)
+    finalSources.push({
+      id: `multiembed-${tmdbId}`,
+      provider: 'MultiEmbed VIP',
+      url: multiEmbedUrl,
+      type: 'hls',
+      quality: '1080p HD',
+      isDirect: false,
+      adStatus: 'ad-free',
+      badgeLabel: 'Ad-Free Pro',
+      tooltip: 'MultiEmbed multi-source resilient streaming mirror',
+    });
+
+    // 4) VidSrc Official VIP
+    finalSources.push({
+      id: `vidsrc-to-${tmdbId}`,
+      provider: 'VidSrc VIP',
+      url: vidsrcToUrl,
+      type: 'hls',
+      quality: '1080p HD',
+      isDirect: false,
+      adStatus: 'ad-free',
+      badgeLabel: 'Ad-Free Pro',
+      tooltip: 'VidSrc global standard cinema mirror',
+    });
+
+    // 5) 2Embed Pro VIP
+    finalSources.push({
+      id: `twoembed-${tmdbId}`,
+      provider: '2Embed VIP',
+      url: twoEmbedUrl,
+      type: 'hls',
+      quality: '1080p HD',
+      isDirect: false,
+      adStatus: 'ad-free',
+      badgeLabel: 'Ad-Free Pro',
+      tooltip: '2Embed multi-resolution backup stream',
+    });
+
+    // 6) AutoEmbed VIP
+    finalSources.push({
+      id: `autoembed-${tmdbId}`,
+      provider: 'AutoEmbed VIP',
+      url: autoembedUrl,
+      type: 'hls',
+      quality: '1080p HD',
+      isDirect: false,
+      adStatus: 'ad-free',
+      badgeLabel: 'Ad-Free Pro',
+      tooltip: 'AutoEmbed VIP adaptive streaming mirror',
+    });
+
+    // 7) VidLink Pro
+    finalSources.push({
+      id: `vidlink-${tmdbId}`,
+      provider: 'VidLink Pro',
+      url: vidlinkUrl,
+      type: 'hls',
+      quality: '1080p HD',
+      isDirect: false,
+      adStatus: 'ad-free',
+      badgeLabel: 'Ad-Free Pro',
+      tooltip: 'VidLink Pro high-bitrate stream with multi-audio & subtitles',
+    });
+
+    if (adminStream) {
+      finalSources.unshift(adminStream);
+    }
 
     // 5. Deduplicate subtitles and ensure baseline defaults
     const seenSubLang = new Set<string>();
@@ -257,7 +312,7 @@ export class SparkBoxCoreService {
       sources: finalSources,
       embedServers,
       subtitles,
-      fallbackEmbedUrl: '',
+      fallbackEmbedUrl: vidsrcPmUrl,
     };
 
     // Cache result for 30 minutes

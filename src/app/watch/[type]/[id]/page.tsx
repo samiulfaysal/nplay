@@ -13,7 +13,6 @@ import {
   TMDB_IMAGE_SIZES,
 } from '@/lib/tmdb';
 import { SparkBoxCore } from '@/lib/providerCore';
-import { VideoPlayer } from '@/components/player/VideoPlayer';
 import { MovieGrid } from '@/components/movies/MovieGrid';
 import { SeasonEpisodeSelector } from '@/components/player/SeasonEpisodeSelector';
 import { MovyWatchHero } from '@/components/movies/MovyWatchHero';
@@ -184,7 +183,7 @@ export default async function WatchPage({ params, searchParams }: WatchPageProps
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 sm:pt-6 space-y-6 sm:space-y-8">
-        {/* Movy Cinematic Hero Details Showcase */}
+        {/* Movy Cinematic Hero & Fullscreen Video Player */}
         <MovyWatchHero
           id={id}
           type={isTv ? 'tv' : 'movie'}
@@ -203,80 +202,12 @@ export default async function WatchPage({ params, searchParams }: WatchPageProps
           episode={verifiedEpisode}
           trailerKey={content.trailer_key}
           item={content}
+          sources={streamPayload.sources}
+          embedServers={streamPayload.embedServers}
+          subtitles={streamPayload.subtitles}
+          fallbackEmbedUrl={streamPayload.fallbackEmbedUrl}
+          imdbId={imdbId}
         />
-
-        {/* 1. Main Streaming Video Player Section */}
-        <section id="player-viewport" className="space-y-2.5 sm:space-y-3.5 scroll-mt-6">
-          <div className="flex items-center justify-between gap-2.5 border-b border-white/[0.08] pb-2.5 sm:pb-3">
-            <div className="space-y-0.5 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="px-2 py-0.5 rounded text-[11px] font-black uppercase tracking-wider bg-red-600 text-white shadow-sm shrink-0">
-                  {content.quality || '4K UHD'}
-                </span>
-                <span className="px-2 py-0.5 rounded text-[11px] font-bold uppercase bg-white/10 text-gray-200 border border-white/5 shrink-0">
-                  {isTv ? `Season ${verifiedSeason} · Episode ${verifiedEpisode}` : 'Direct Pro Stream'}
-                </span>
-                <div className="flex items-center gap-1 text-amber-400 font-bold text-xs shrink-0">
-                  <Star className="w-3.5 h-3.5 fill-amber-400" />
-                  <span>{content.vote_average?.toFixed(1) || '8.0'}</span>
-                </div>
-              </div>
-              <h2 className="text-sm sm:text-lg font-bold text-white tracking-wide truncate">
-                {title} {isTv && `— S${verifiedSeason} E${verifiedEpisode}`}
-              </h2>
-            </div>
-
-            {/* Quick Top Controls */}
-            <div className="flex items-center gap-1.5 shrink-0">
-              <WatchTrailerButton
-                title={title}
-                tmdbId={id}
-                mediaType={type}
-                trailerKey={content.trailer_key}
-              />
-              <WatchlistButton item={content} variant="header" />
-              <ShareButton title={title} />
-            </div>
-          </div>
-
-          {/* Upcoming Theatrical Release Notice Banner */}
-          {isUpcoming && (
-            <div className="p-3.5 sm:p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs sm:text-sm flex items-start gap-3">
-              <div className="p-1.5 rounded-lg bg-amber-500/20 text-amber-400 shrink-0 mt-0.5">
-                <Clock className="w-4 h-4" />
-              </div>
-              <div className="space-y-1">
-                <div className="font-bold text-amber-300 flex items-center gap-2 flex-wrap">
-                  <span>Upcoming Theatrical Premiere</span>
-                  <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono text-xs">
-                    {new Date(releaseDate).toLocaleDateString('en-US', {
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })}
-                  </span>
-                </div>
-                <p className="text-amber-200/80 text-xs leading-relaxed">
-                  This title is scheduled for future release. Decentralized streaming mirrors do not host pre-release theatrical feeds. In the meantime, enjoy the official trailer or save it to your Watchlist to get notified on release day!
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Video Player */}
-          <VideoPlayer
-            sources={streamPayload.sources}
-            embedServers={streamPayload.embedServers}
-            subtitles={streamPayload.subtitles}
-            poster={backdropUrl}
-            fallbackEmbedUrl={streamPayload.fallbackEmbedUrl}
-            title={title}
-            releaseYear={releaseYear}
-            imdbId={imdbId}
-            isTv={isTv}
-            currentEpisode={verifiedEpisode}
-          />
-        </section>
 
         {/* 2. TV Show Season and Episode Selector (Only on TV pages) */}
         {isTv && content.seasons && content.seasons.length > 0 && (

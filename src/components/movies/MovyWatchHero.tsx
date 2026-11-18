@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -14,10 +14,13 @@ import {
   Film,
   Sparkles,
   Layers,
+  Maximize,
 } from 'lucide-react';
 import { WatchlistButton } from '@/components/movies/WatchlistButton';
 import { WatchTrailerButton } from '@/components/modals/WatchTrailerButton';
 import { ShareButton } from '@/components/movies/ShareButton';
+import { VideoPlayer } from '@/components/player/VideoPlayer';
+import { StreamSource, Subtitle } from '@/types/content';
 
 interface MovyWatchHeroProps {
   id: string;
@@ -37,6 +40,11 @@ interface MovyWatchHeroProps {
   episode?: number;
   trailerKey?: string | null;
   item: any;
+  sources?: StreamSource[];
+  embedServers?: any[];
+  subtitles?: Subtitle[];
+  fallbackEmbedUrl?: string;
+  imdbId?: string;
   onPlayClick?: () => void;
 }
 
@@ -58,22 +66,102 @@ export function MovyWatchHero({
   episode,
   trailerKey,
   item,
+  sources = [],
+  embedServers = [],
+  subtitles = [],
+  fallbackEmbedUrl,
+  imdbId,
   onPlayClick,
 }: MovyWatchHeroProps) {
   const router = useRouter();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const playerContainerRef = useRef<HTMLDivElement>(null);
 
-  const handleScrollToPlayer = () => {
+  const handleWatchNow = () => {
+    setIsPlaying(true);
     if (onPlayClick) {
       onPlayClick();
-    } else {
-      const playerEl = document.getElementById('player-viewport');
-      if (playerEl) {
-        playerEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
     }
+    // Automatically trigger fullscreen mode upon clicking Watch Now
+    setTimeout(() => {
+      const container = playerContainerRef.current;
+      if (container) {
+        if (container.requestFullscreen) {
+          container.requestFullscreen().catch(() => {});
+        } else if ((container as any).webkitRequestFullscreen) {
+          (container as any).webkitRequestFullscreen();
+        }
+      }
+    }, 120);
   };
 
   const formattedRating = typeof rating === 'number' ? rating.toFixed(1) : (rating || '8.0');
+
+  // Fullscreen Cinema Video Player View
+  if (isPlaying) {
+    return (
+      <div
+        ref={playerContainerRef}
+        className="relative w-full rounded-3xl overflow-hidden mb-6 sm:mb-8 border border-white/[0.08] bg-black shadow-2xl p-2 sm:p-4 space-y-3"
+      >
+        {/* Top Control Bar */}
+        <div className="flex items-center justify-between pb-2 border-b border-white/[0.08]">
+          <button
+            type="button"
+            onClick={() => {
+              if (document.fullscreenElement) {
+                document.exitFullscreen().catch(() => {});
+              }
+              setIsPlaying(false);
+            }}
+            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md border border-white/15 transition-all active:scale-95 shadow-md"
+            title="Back to Movie Details"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Info</span>
+          </button>
+
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-white font-bold text-xs sm:text-sm truncate max-w-[200px] sm:max-w-md">
+              {title} {isTv && season && episode && `— S${season} E${episode}`}
+            </span>
+            <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-red-600 text-white shrink-0">
+              {quality}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (!document.fullscreenElement && playerContainerRef.current) {
+                playerContainerRef.current.requestFullscreen().catch(() => {});
+              } else if (document.fullscreenElement) {
+                document.exitFullscreen().catch(() => {});
+              }
+            }}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-gray-200 hover:text-white text-xs font-semibold border border-white/10 transition-all active:scale-95"
+          >
+            <Maximize className="w-3.5 h-3.5" />
+            <span>Fullscreen</span>
+          </button>
+        </div>
+
+        {/* Video Player */}
+        <VideoPlayer
+          sources={sources}
+          embedServers={embedServers}
+          subtitles={subtitles}
+          poster={backdropUrl}
+          fallbackEmbedUrl={fallbackEmbedUrl}
+          title={title}
+          releaseYear={releaseYear}
+          imdbId={imdbId}
+          isTv={isTv}
+          currentEpisode={episode}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full rounded-3xl overflow-hidden mb-6 sm:mb-8 border border-white/[0.08] bg-[#0c0d14] shadow-2xl">
@@ -181,7 +269,7 @@ export function MovyWatchHero({
             {/* 1. Primary Play CTA Button */}
             <button
               type="button"
-              onClick={handleScrollToPlayer}
+              onClick={handleWatchNow}
               className="px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-red-600 hover:bg-red-500 text-white font-black text-xs sm:text-sm flex items-center gap-2.5 shadow-xl shadow-red-600/30 transition-all transform hover:scale-105 active:scale-95 shrink-0"
             >
               <Play className="w-4 h-4 fill-white" />

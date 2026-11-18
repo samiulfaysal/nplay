@@ -57,10 +57,6 @@ const COUNTRIES = [
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [moviesOpen, setMoviesOpen] = useState(false);
-  const [tvOpen, setTvOpen] = useState(false);
-  const [genreOpen, setGenreOpen] = useState(false);
-  const [countryOpen, setCountryOpen] = useState(false);
 
   // Instant Live Search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -200,253 +196,99 @@ export function Navbar() {
           </div>
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-1 xl:gap-2 shrink-0">
+        {/* Desktop Navigation - Movy-Style Sleek Floating Glass Pill Bar */}
+        <nav className="hidden lg:flex items-center gap-1 p-1 rounded-full bg-white/[0.04] backdrop-blur-xl border border-white/[0.08] shadow-[0_2px_12px_rgba(0,0,0,0.4)] shrink-0">
           {/* 1. Home Link */}
           <Link
             href="/"
-            className={`px-3 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
+            className={`px-3.5 py-1.5 rounded-full text-xs xl:text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
               pathname === '/'
-                ? 'text-white bg-white/10 shadow-inner'
+                ? 'text-white bg-white/15 shadow-sm'
                 : 'text-gray-300 hover:text-white hover:bg-white/5'
             }`}
           >
             Home
           </Link>
 
-          {/* 2. Movies Dropdown (Featured, Popular, Top Rated, Upcoming) */}
-          <div className="relative shrink-0">
-            <button
-              onClick={() => {
-                setMoviesOpen(!moviesOpen);
-                setTvOpen(false);
-                setGenreOpen(false);
-                setCountryOpen(false);
-              }}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
-                pathname.startsWith('/movies')
-                  ? 'text-white bg-white/10'
-                  : 'text-gray-300 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Film className="w-4 h-4 text-red-500 shrink-0" />
-              <span className="whitespace-nowrap">Movies</span>
-              <ChevronDown
-                className={`w-3.5 h-3.5 shrink-0 transition-transform ${
-                  moviesOpen ? 'rotate-180' : ''
-                }`}
-              />
-            </button>
+          {/* 2. Movies Link */}
+          <Link
+            href="/movies"
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs xl:text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
+              pathname.startsWith('/movies')
+                ? 'text-white bg-white/15 shadow-sm'
+                : 'text-gray-300 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Film className="w-3.5 h-3.5 text-red-500 shrink-0" />
+            <span className="whitespace-nowrap">Movies</span>
+          </Link>
 
-            {moviesOpen && (
-              <div
-                className="absolute top-full left-0 mt-2 w-48 p-2 rounded-2xl glass-panel shadow-2xl flex flex-col gap-1 animate-in fade-in slide-in-from-top-2 duration-150 z-50"
-                onMouseLeave={() => setMoviesOpen(false)}
-              >
-                <Link
-                  href="/movies"
-                  onClick={() => setMoviesOpen(false)}
-                  className="px-3 py-2 rounded-lg text-xs font-semibold text-gray-300 hover:text-white hover:bg-red-600/20 hover:text-red-400 transition-colors"
-                >
-                  Featured Movies
-                </Link>
-                <Link
-                  href="/movies?sort=popular"
-                  onClick={() => setMoviesOpen(false)}
-                  className="px-3 py-2 rounded-lg text-xs font-semibold text-gray-300 hover:text-white hover:bg-red-600/20 hover:text-red-400 transition-colors"
-                >
-                  Most Popular
-                </Link>
-                <Link
-                  href="/movies?sort=top_rated"
-                  onClick={() => setMoviesOpen(false)}
-                  className="px-3 py-2 rounded-lg text-xs font-semibold text-gray-300 hover:text-white hover:bg-red-600/20 hover:text-red-400 transition-colors"
-                >
-                  Top Rated
-                </Link>
-                <Link
-                  href="/movies?sort=upcoming"
-                  onClick={() => setMoviesOpen(false)}
-                  className="px-3 py-2 rounded-lg text-xs font-semibold text-gray-300 hover:text-white hover:bg-red-600/20 hover:text-red-400 transition-colors"
-                >
-                  Upcoming Releases
-                </Link>
-              </div>
-            )}
-          </div>
-
-          {/* 3. TV-Series Dropdown (Popular, Airing Today, Top Rated) */}
-          <div className="relative shrink-0">
-            <button
-              onClick={() => {
-                setTvOpen(!tvOpen);
-                setMoviesOpen(false);
-                setGenreOpen(false);
-                setCountryOpen(false);
-              }}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
-                pathname.startsWith('/tv')
-                  ? 'text-white bg-white/10'
-                  : 'text-gray-300 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Tv className="w-4 h-4 text-rose-500 shrink-0" />
-              <span className="whitespace-nowrap">TV-Series</span>
-              <ChevronDown
-                className={`w-3.5 h-3.5 shrink-0 transition-transform ${
-                  tvOpen ? 'rotate-180' : ''
-                }`}
-              />
-            </button>
-
-            {tvOpen && (
-              <div
-                className="absolute top-full left-0 mt-2 w-48 p-2 rounded-2xl glass-panel shadow-2xl flex flex-col gap-1 animate-in fade-in slide-in-from-top-2 duration-150 z-50"
-                onMouseLeave={() => setTvOpen(false)}
-              >
-                <Link
-                  href="/tv"
-                  onClick={() => setTvOpen(false)}
-                  className="px-3 py-2 rounded-lg text-xs font-semibold text-gray-300 hover:text-white hover:bg-red-600/20 hover:text-red-400 transition-colors"
-                >
-                  Popular Series
-                </Link>
-                <Link
-                  href="/tv?sort=airing_today"
-                  onClick={() => setTvOpen(false)}
-                  className="px-3 py-2 rounded-lg text-xs font-semibold text-gray-300 hover:text-white hover:bg-red-600/20 hover:text-red-400 transition-colors"
-                >
-                  Airing Today
-                </Link>
-                <Link
-                  href="/tv?sort=top_rated"
-                  onClick={() => setTvOpen(false)}
-                  className="px-3 py-2 rounded-lg text-xs font-semibold text-gray-300 hover:text-white hover:bg-red-600/20 hover:text-red-400 transition-colors"
-                >
-                  Top Rated Series
-                </Link>
-              </div>
-            )}
-          </div>
+          {/* 3. TV-Series Link */}
+          <Link
+            href="/tv"
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs xl:text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
+              pathname.startsWith('/tv')
+                ? 'text-white bg-white/15 shadow-sm'
+                : 'text-gray-300 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Tv className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+            <span className="whitespace-nowrap">TV Shows</span>
+          </Link>
 
           {/* 4. Anime Link */}
           <Link
             href="/anime"
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs xl:text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
               pathname === '/anime'
-                ? 'text-white bg-white/10 shadow-inner'
+                ? 'text-white bg-white/15 shadow-sm'
                 : 'text-gray-300 hover:text-white hover:bg-white/5'
             }`}
           >
-            <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+            <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
             <span className="whitespace-nowrap">Anime</span>
           </Link>
 
-          {/* 5. Genres Dropdown */}
-          <div className="relative shrink-0">
-            <button
-              onClick={() => {
-                setGenreOpen(!genreOpen);
-                setCountryOpen(false);
-                setMoviesOpen(false);
-                setTvOpen(false);
-              }}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold text-gray-300 hover:text-white hover:bg-white/5 transition-all whitespace-nowrap shrink-0"
-            >
-              <Layers className="w-4 h-4 text-red-500 shrink-0" />
-              <span className="whitespace-nowrap">Genres</span>
-              <ChevronDown
-                className={`w-3.5 h-3.5 shrink-0 transition-transform ${
-                  genreOpen ? 'rotate-180' : ''
-                }`}
-              />
-            </button>
+          {/* 5. Top IMDb */}
+          <Link
+            href="/top-imdb"
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs xl:text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
+              pathname === '/top-imdb'
+                ? 'text-white bg-white/15 shadow-sm'
+                : 'text-gray-300 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Star className="w-3.5 h-3.5 text-amber-400 shrink-0 fill-amber-400/20" />
+            <span className="whitespace-nowrap">Top IMDb</span>
+          </Link>
 
-            {genreOpen && (
-              <div
-                className="absolute top-full left-0 mt-2 w-60 p-3 rounded-2xl glass-panel shadow-2xl grid grid-cols-2 gap-1 animate-in fade-in slide-in-from-top-2 duration-150 z-50"
-                onMouseLeave={() => setGenreOpen(false)}
-              >
-                {GENRES.map((g) => (
-                  <Link
-                    key={g}
-                    href={`/genre/${g.toLowerCase()}`}
-                    onClick={() => setGenreOpen(false)}
-                    className="px-2.5 py-1.5 rounded-lg text-xs font-medium text-gray-300 hover:text-white hover:bg-red-600/20 hover:text-red-400 transition-colors"
-                  >
-                    {g}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* 6. Country Filter Dropdown */}
-          <div className="relative shrink-0">
-            <button
-              onClick={() => {
-                setCountryOpen(!countryOpen);
-                setGenreOpen(false);
-                setMoviesOpen(false);
-                setTvOpen(false);
-              }}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold text-gray-300 hover:text-white hover:bg-white/5 transition-all whitespace-nowrap shrink-0"
-            >
-              <Globe2 className="w-4 h-4 text-cyan-400 shrink-0" />
-              <span className="whitespace-nowrap">Country</span>
-              <ChevronDown
-                className={`w-3.5 h-3.5 shrink-0 transition-transform ${
-                  countryOpen ? 'rotate-180' : ''
-                }`}
-              />
-            </button>
-
-            {countryOpen && (
-              <div
-                className="absolute top-full left-0 mt-2 w-52 p-2.5 rounded-2xl glass-panel shadow-2xl flex flex-col gap-1 animate-in fade-in slide-in-from-top-2 duration-150 z-50"
-                onMouseLeave={() => setCountryOpen(false)}
-              >
-                {COUNTRIES.map((country) => (
-                  <Link
-                    key={country}
-                    href={`/browse?country=${encodeURIComponent(country.toLowerCase())}`}
-                    onClick={() => setCountryOpen(false)}
-                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
-                  >
-                    {country}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* 6. Live TV Link */}
+          <Link
+            href="/live-tv"
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs xl:text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
+              pathname === '/live-tv'
+                ? 'text-white bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                : 'text-gray-300 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="whitespace-nowrap">Live TV</span>
+            <span className="px-1.5 py-0.2 rounded text-[9px] font-black uppercase bg-red-600 text-white shrink-0">
+              HD
+            </span>
+          </Link>
 
           {/* 7. Explore Catalog Link */}
           <Link
             href="/browse"
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs xl:text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
               pathname === '/browse'
-                ? 'text-white bg-white/10 shadow-inner'
+                ? 'text-white bg-white/15 shadow-sm'
                 : 'text-gray-300 hover:text-white hover:bg-white/5'
             }`}
           >
-            <SlidersHorizontal className="w-4 h-4 text-purple-400 shrink-0" />
+            <SlidersHorizontal className="w-3.5 h-3.5 text-purple-400 shrink-0" />
             <span className="whitespace-nowrap">Explore</span>
-          </Link>
-
-          {/* 8. Live TV Link */}
-          <Link
-            href="/live-tv"
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
-              pathname === '/live-tv'
-                ? 'text-white bg-red-600/20 text-red-400 border border-red-500/30'
-                : 'text-gray-300 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <Radio className="w-4 h-4 text-emerald-400 shrink-0 animate-pulse" />
-            <span className="whitespace-nowrap">Live TV</span>
-            <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-red-600 text-white shrink-0">
-              HD
-            </span>
           </Link>
         </nav>
 

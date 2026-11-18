@@ -55,12 +55,14 @@ export function VideoPlayer({
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Default to first available Pro source (e.g. MovieBox Pro)
+  // Default to first available Pro source (e.g. MovieBox Pro or VidPrime VIP)
   const [activeServerId, setActiveServerId] = useState<string>(() => {
     return sources[0]?.id || '';
   });
 
-  const [resolvedUrl, setResolvedUrl] = useState<string>('');
+  const [resolvedUrl, setResolvedUrl] = useState<string>(() => {
+    return sources[0]?.url || '';
+  });
   const [isResolving, setIsResolving] = useState<boolean>(false);
   const [resolveError, setResolveError] = useState<string | null>(null);
 
@@ -131,23 +133,45 @@ export function VideoPlayer({
     }
   }, [activeServerId, activeSource]);
 
+  const isEmbedStream =
+    Boolean(resolvedUrl) &&
+    !activeSource?.isDirect &&
+    !resolvedUrl.startsWith('/api/stream/proxy') &&
+    (resolvedUrl.startsWith('http://') ||
+      resolvedUrl.startsWith('https://') ||
+      resolvedUrl.includes('embed') ||
+      resolvedUrl.includes('vidsrc') ||
+      resolvedUrl.includes('multiembed') ||
+      resolvedUrl.includes('vidlink') ||
+      resolvedUrl.includes('autoembed') ||
+      resolvedUrl.includes('2embed') ||
+      !resolvedUrl.match(/\.(m3u8|mpd|mp4|webm)($|\?)/i));
+
   // Video playback engine (Supports MPEG-DASH via dashjs, HLS via hls.js, MP4 via HTML5)
   useEffect(() => {
+    if (isEmbedStream) return;
     const video = videoRef.current;
     if (!video) return;
 
     // Cleanup previous players
     if (dashPlayerRef.current) {
-      dashPlayerRef.current.destroy();
+      try {
+        dashPlayerRef.current.pause();
+        dashPlayerRef.current.reset();
+      } catch {}
       dashPlayerRef.current = null;
     }
     if (hlsPlayerRef.current) {
-      hlsPlayerRef.current.destroy();
+      try {
+        hlsPlayerRef.current.destroy();
+      } catch {}
       hlsPlayerRef.current = null;
     }
 
-    video.removeAttribute('src');
-    video.load();
+    try {
+      video.removeAttribute('src');
+      video.load();
+    } catch {}
 
     if (!resolvedUrl) return;
 
@@ -161,23 +185,19 @@ export function VideoPlayer({
           const dashjs = dashjsModule.default || dashjsModule;
           const player = dashjs.MediaPlayer().create();
           player.initialize(video, resolvedUrl, false);
-          player.updateSettings({
-            streaming: {
-              buffer: {
-                fastSwitchEnabled: true,
-                initialBufferLength: 0.5,
-                stableBufferTime: 10,
-                bufferTimeAtTopQuality: 15,
+          try {
+            player.updateSettings({
+              streaming: {
+                abr: {
+                  autoSwitchBitrate: { video: true },
+                },
               },
-              abr: {
-                autoSwitchBitrate: { video: true },
-              },
-            },
-          });
+            });
+          } catch {}
           dashPlayerRef.current = player;
         })
         .catch((err) => {
-          console.error('[VideoPlayer] dashjs load error:', err);
+          console.warn('[VideoPlayer] dashjs load error:', err);
         });
     } else if (isHls) {
       // HLS via hls.js
@@ -199,11 +219,16 @@ export function VideoPlayer({
 
     return () => {
       if (dashPlayerRef.current) {
-        dashPlayerRef.current.destroy();
+        try {
+          dashPlayerRef.current.pause();
+          dashPlayerRef.current.reset();
+        } catch {}
         dashPlayerRef.current = null;
       }
       if (hlsPlayerRef.current) {
-        hlsPlayerRef.current.destroy();
+        try {
+          hlsPlayerRef.current.destroy();
+        } catch {}
         hlsPlayerRef.current = null;
       }
     };
@@ -396,135 +421,150 @@ export function VideoPlayer({
           </div>
         )}
 
-        {/* Native HTML5 Video Player */}
-        <video
-          ref={videoRef}
-          poster={poster}
-          preload="auto"
-          onTimeUpdate={handleTimeUpdate}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
-          onEnded={() => {
-            setIsPlaying(false);
-            if (isTv && onNextEpisode) onNextEpisode();
-          }}
-          onClick={togglePlay}
-          className="w-full h-full object-contain cursor-pointer"
-          playsInline
-        >
-          {subtitles.map((sub) => (
-            <track
-              key={sub.language}
-              kind="subtitles"
-              src={sub.url}
-              srcLang={sub.language}
-              label={sub.label}
-              default={sub.default}
-            />
-          ))}
-        </video>
-
-        {/* Big Centered Play Button when Paused */}
-        {!isPlaying && resolvedUrl && (
-          <button
-            onClick={togglePlay}
-            className="absolute inset-0 m-auto w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-red-600/90 text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all"
-            aria-label="Play video"
-          >
-            <Play className="w-8 h-8 sm:w-10 sm:h-10 fill-white translate-x-1" />
-          </button>
-        )}
-
-        {/* Custom Cinema Control Bar */}
-        <div
-          className={`absolute bottom-0 left-0 right-0 p-3 sm:p-4 bg-gradient-to-t from-black/95 via-black/75 to-transparent transition-opacity duration-300 ${
-            showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}
-        >
-          {/* Progress Slider */}
-          <input
-            type="range"
-            min={0}
-            max={duration || 100}
-            value={currentTime}
-            onChange={handleSeek}
-            className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-red-600 mb-3"
+        {/* Stream Viewport: Embed Player (VidLink/AutoEmbed/VidSrc) or Native Video (HLS/MP4) */}
+        {isEmbedStream ? (
+          <iframe
+            key={resolvedUrl}
+            src={resolvedUrl}
+            title={title}
+            className="w-full h-full border-0 absolute inset-0 bg-black z-20"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+            allowFullScreen
+            referrerPolicy="origin"
           />
+        ) : (
+          <>
+            {/* Native HTML5 Video Player */}
+            <video
+              ref={videoRef}
+              poster={poster}
+              preload="auto"
+              onTimeUpdate={handleTimeUpdate}
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+              onEnded={() => {
+                setIsPlaying(false);
+                if (isTv && onNextEpisode) onNextEpisode();
+              }}
+              onClick={togglePlay}
+              className="w-full h-full object-contain cursor-pointer"
+              playsInline
+            >
+              {subtitles.map((sub) => (
+                <track
+                  key={sub.language}
+                  kind="subtitles"
+                  src={sub.url}
+                  srcLang={sub.language}
+                  label={sub.label}
+                  default={sub.default}
+                />
+              ))}
+            </video>
 
-          <div className="flex items-center justify-between text-white text-xs sm:text-sm">
-            <div className="flex items-center gap-2 sm:gap-3">
+            {/* Big Centered Play Button when Paused */}
+            {!isPlaying && resolvedUrl && (
               <button
                 onClick={togglePlay}
-                className="hover:text-red-400 transition-colors"
-                title={isPlaying ? "Pause (Space)" : "Play (Space)"}
+                className="absolute inset-0 m-auto w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-red-600/90 text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all"
+                aria-label="Play video"
               >
-                {isPlaying ? (
-                  <Pause className="w-5 h-5 fill-current" />
-                ) : (
-                  <Play className="w-5 h-5 fill-current" />
-                )}
+                <Play className="w-8 h-8 sm:w-10 sm:h-10 fill-white translate-x-1" />
               </button>
+            )}
 
-              <button
-                onClick={() => handleSkip(-10)}
-                className="hover:text-red-400 text-gray-300 transition-colors p-1"
-                title="Rewind 10s (←)"
-              >
-                <RotateCcw className="w-4 h-4" />
-              </button>
+            {/* Custom Cinema Control Bar */}
+            <div
+              className={`absolute bottom-0 left-0 right-0 p-3 sm:p-4 bg-gradient-to-t from-black/95 via-black/75 to-transparent transition-opacity duration-300 ${
+                showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              {/* Progress Slider */}
+              <input
+                type="range"
+                min={0}
+                max={duration || 100}
+                value={currentTime}
+                onChange={handleSeek}
+                className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-red-600 mb-3"
+              />
 
-              <button
-                onClick={() => handleSkip(10)}
-                className="hover:text-red-400 text-gray-300 transition-colors p-1"
-                title="Forward 10s (→)"
-              >
-                <RotateCw className="w-4 h-4" />
-              </button>
+              <div className="flex items-center justify-between text-white text-xs sm:text-sm">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <button
+                    onClick={togglePlay}
+                    className="hover:text-red-400 transition-colors"
+                    title={isPlaying ? "Pause (Space)" : "Play (Space)"}
+                  >
+                    {isPlaying ? (
+                      <Pause className="w-5 h-5 fill-current" />
+                    ) : (
+                      <Play className="w-5 h-5 fill-current" />
+                    )}
+                  </button>
 
-              <button
-                onClick={toggleMute}
-                className="hover:text-red-400 transition-colors"
-                title={isMuted ? "Unmute (M)" : "Mute (M)"}
-              >
-                {isMuted ? (
-                  <VolumeX className="w-5 h-5" />
-                ) : (
-                  <Volume2 className="w-5 h-5" />
-                )}
-              </button>
+                  <button
+                    onClick={() => handleSkip(-10)}
+                    className="hover:text-red-400 text-gray-300 transition-colors p-1"
+                    title="Rewind 10s (←)"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                  </button>
 
-              <span className="text-gray-300 font-medium text-xs font-mono">
-                {formatTime(currentTime)} / {formatTime(duration)}
-              </span>
+                  <button
+                    onClick={() => handleSkip(10)}
+                    className="hover:text-red-400 text-gray-300 transition-colors p-1"
+                    title="Forward 10s (→)"
+                  >
+                    <RotateCw className="w-4 h-4" />
+                  </button>
+
+                  <button
+                    onClick={toggleMute}
+                    className="hover:text-red-400 transition-colors"
+                    title={isMuted ? "Unmute (M)" : "Mute (M)"}
+                  >
+                    {isMuted ? (
+                      <VolumeX className="w-5 h-5" />
+                    ) : (
+                      <Volume2 className="w-5 h-5" />
+                    )}
+                  </button>
+
+                  <span className="text-gray-300 font-medium text-xs font-mono">
+                    {formatTime(currentTime)} / {formatTime(duration)}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 sm:gap-3">
+                  {isTv && onNextEpisode && (
+                    <button
+                      type="button"
+                      onClick={onNextEpisode}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white text-[11px] font-bold transition-all shadow-md active:scale-95"
+                      title="Play Next Episode"
+                    >
+                      <SkipForward className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Next Ep</span>
+                    </button>
+                  )}
+
+                  <span className="px-2 py-0.5 rounded bg-white/10 text-[11px] font-bold text-gray-300">
+                    {activeSource?.quality || '1080P'}
+                  </span>
+
+                  <button
+                    onClick={toggleFullscreen}
+                    className="hover:text-red-400 transition-colors"
+                    title="Fullscreen (F)"
+                  >
+                    <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </button>
+                </div>
+              </div>
             </div>
-
-            <div className="flex items-center gap-2 sm:gap-3">
-              {isTv && onNextEpisode && (
-                <button
-                  type="button"
-                  onClick={onNextEpisode}
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white text-[11px] font-bold transition-all shadow-md active:scale-95"
-                  title="Play Next Episode"
-                >
-                  <SkipForward className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Next Ep</span>
-                </button>
-              )}
-
-              <span className="px-2 py-0.5 rounded bg-white/10 text-[11px] font-bold text-gray-300">
-                {activeSource?.quality || '1080P'}
-              </span>
-
-              <button
-                onClick={toggleFullscreen}
-                className="hover:text-red-400 transition-colors"
-                title="Fullscreen (F)"
-              >
-                <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
-            </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
 
       {/* 2. Sleek Streaming Server Selector Bar - 100% Pro Direct Servers */}
@@ -621,6 +661,14 @@ export function VideoPlayer({
                       userInteractedRef.current = true;
                       setActiveServerId(src.id);
                       setActiveTooltipId(activeTooltipId === src.id ? null : src.id);
+                      if (src.url.startsWith('/api/stream/resolve')) {
+                        setIsResolving(true);
+                        setResolvedUrl('');
+                      } else {
+                        setIsResolving(false);
+                        setResolvedUrl(src.url);
+                      }
+                      showToast(`⚡ Switched to server: ${src.provider}`);
                       e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
                     }}
                     className={`flex items-center gap-2 px-3 py-2 rounded-xl font-bold text-xs transition-all shrink-0 active:scale-95 ${
